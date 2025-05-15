@@ -1,0 +1,37 @@
+.history-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.history-page h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #2d3748;
+}
+
+.clear-all-btn {
+  display: block;
+  margin: 0 auto 1.5rem;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.clear-all-btn:hover {
+  background-color: #c53030;
+}
+
+.empty-history {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: #f7fafc;
+  border: 1px dashed #cbd5e0;
+  border-radius: 12px;
+}
