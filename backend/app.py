@@ -7,6 +7,7 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.image import adjust_brightness
 import tensorflow as tf
 from PIL import Image
+import tempfile
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -43,37 +44,42 @@ def predict():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
-    # Save file temporarily
-    temp_path = 'temp.jpg'
-    file.save(temp_path)
-
+    temp_path = None
     try:
+        # Create a temporary file (Windows-safe)
+        with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp:
+            temp_path = temp.name
+
+        # Save the uploaded file to temp path
+        file.save(temp_path)
+
+        # Preprocess and predict
         preprocessed_img = preprocess_image(temp_path)
         prediction = model.predict(preprocessed_img)[0][0]
 
-        # For binary classification with sigmoid output:
-        good_confidence = float(prediction)          # model output as probability for 'Good Seed'
+        good_confidence = float(prediction)
         bad_confidence = 1.0 - good_confidence
 
         label = 'Good Seed' if good_confidence >= bad_confidence else 'Bad Seed'
         confidence = good_confidence if good_confidence >= bad_confidence else bad_confidence
 
-        os.remove(temp_path)  # cleanup temp file
-
         return jsonify({
             'label': label,
-            'confidence': round(confidence * 100, 2),      # Highest confidence %
-            'good': good_confidence,                       # Good seed probability (0-1)
-            'bad': bad_confidence,                         # Bad seed probability (0-1)
-            'confidence_good': round(good_confidence * 100, 2),  # Good seed confidence %
-            'confidence_bad': round(bad_confidence * 100, 2),    # Bad seed confidence %
+            'confidence': round(confidence * 100, 2),
+            'good': good_confidence,
+            'bad': bad_confidence,
+            'confidence_good': round(good_confidence * 100, 2),
+            'confidence_bad': round(bad_confidence * 100, 2),
             'score': round(float(prediction), 4)
         })
 
     except Exception as e:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
         return jsonify({'error': str(e)}), 500
+
+    finally:
+        # Clean up temp file if it exists
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

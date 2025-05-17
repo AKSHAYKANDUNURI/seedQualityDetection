@@ -98,7 +98,7 @@ class PaddySeedClassifier:
 
 if __name__ == '__main__':
     # Update this path to your dataset directory containing class subfolders
-    dataset_path = r'C:\Users\Aksha\Desktop\seed_quality\seed_quality\dataset\train'
+    dataset_path = r'C:\Users\Aksha\Desktop\seed_quality\dataset\train'
 
     classifier = PaddySeedClassifier()
     classifier.create_model()
